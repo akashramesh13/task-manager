@@ -29,7 +29,7 @@ router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({
+        res.json({
             user,
             token
         })
@@ -45,7 +45,7 @@ router.post('/users/logout', auth, async (req, res) => {
         })
         await req.user.save()
 
-        res.send()
+        res.json()
     } catch (e) {
         res.status(500).send()
     }
@@ -55,14 +55,14 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     try {
         req.user.tokens = []
         await req.user.save()
-        res.send()
+        res.json()
     } catch (e) {
         res.status(500).send()
     }
 })
 
 router.get('/users/me', auth, async (req, res) => {
-    res.send(req.user)
+    res.json(req.user)
 })
 
 router.get('/users/:id', async (req, res) => {
@@ -75,7 +75,7 @@ router.get('/users/:id', async (req, res) => {
             return res.status(404).send()
         }
 
-        res.send(user)
+        res.json(user)
     } catch (e) {
         res.status(500).send()
     }
@@ -97,7 +97,7 @@ router.patch('/users/me', auth, async (req, res) => {
 
         updates.forEach((update) => user[update] = req.body[update])
         await user.save()
-        res.send(user)
+        res.json(user)
     } catch (e) {
         res.status(400).send(e)
     }
@@ -109,7 +109,7 @@ router.delete('/users/me', auth, async (req, res) => {
         const user = await req.user
         await user.remove()
         sendCancellationEmail(req.user.email, req.user.name)
-        res.send(user)
+        res.json(user)
     } catch (e) {
         res.status(500).send()
     }
@@ -136,7 +136,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
 
     await req.user.save()
 
-    res.send({
+    res.json({
         message: "Profile picture successfully saved"
     })
 }, (err, req, res, next) => {
@@ -148,7 +148,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
 router.delete('/users/me/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
     await req.user.save()
-    res.send()
+    res.json()
 
 })
 
@@ -159,7 +159,7 @@ router.get('/users/me/avatar', auth, async (req, res) => {
         if (!user || !user.avatar)
             throw new Error("No data found")
         res.set('Content-Type', 'image/png')
-        res.send(user.avatar)
+        res.json(user.avatar)
     } catch (error) {
         res.status(404).send(error)
     }
