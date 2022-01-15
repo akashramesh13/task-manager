@@ -16,12 +16,12 @@ router.post('/users', async (req, res) => {
         await user.save()
         sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken()
-        res.status(201).send({
+        res.status(201).json({
             user,
             token
         })
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).json(e)
     }
 })
 
@@ -34,7 +34,7 @@ router.post('/users/login', async (req, res) => {
             token
         })
     } catch (e) {
-        res.status(400).send()
+        res.status(400).json()
     }
 })
 
@@ -47,7 +47,7 @@ router.post('/users/logout', auth, async (req, res) => {
 
         res.json()
     } catch (e) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -57,7 +57,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
         await req.user.save()
         res.json()
     } catch (e) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -72,12 +72,12 @@ router.get('/users/:id', async (req, res) => {
         const user = await User.findById(_id)
 
         if (!user) {
-            return res.status(404).send()
+            return res.status(404).json()
         }
 
         res.json(user)
     } catch (e) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -87,7 +87,7 @@ router.patch('/users/me', auth, async (req, res) => {
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
-        return res.status(400).send({
+        return res.status(400).json({
             error: 'Invalid updates!'
         })
     }
@@ -99,7 +99,7 @@ router.patch('/users/me', auth, async (req, res) => {
         await user.save()
         res.json(user)
     } catch (e) {
-        res.status(400).send(e)
+        res.status(400).json(e)
     }
 })
 
@@ -111,7 +111,7 @@ router.delete('/users/me', auth, async (req, res) => {
         sendCancellationEmail(req.user.email, req.user.name)
         res.json(user)
     } catch (e) {
-        res.status(500).send()
+        res.status(500).json()
     }
 })
 
@@ -161,7 +161,7 @@ router.get('/users/me/avatar', auth, async (req, res) => {
         res.set('Content-Type', 'image/png')
         res.json(user.avatar)
     } catch (error) {
-        res.status(404).send(error)
+        res.status(404).json(error)
     }
 })
 
